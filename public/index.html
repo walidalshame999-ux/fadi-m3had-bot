@@ -2,96 +2,126 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>الإدارة العامة - معهد الفتح</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel | المعهد الاحترافي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2c3e50; --accent: #2980b9; }
-        body { font-family: 'Cairo', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; direction: rtl; }
-        .grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
-        button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 12px; border: 1px solid #eee; text-align: right; }
-        th { background: var(--primary); color: white; }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; }
+        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #1c1e21; }
+        .navbar { background: #1877f2; color: white; padding: 1rem 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .wrapper { max-width: 1200px; margin: 2rem auto; display: grid; grid-template-columns: 350px 1fr; gap: 2rem; padding: 0 1rem; }
+        .card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        h2, h3 { margin-top: 0; color: #1877f2; border-bottom: 2px solid #f0f2f5; padding-bottom: 0.5rem; }
+        label { display: block; margin-top: 1rem; font-weight: bold; font-size: 0.9rem; }
+        textarea, input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+        .btn { background: #42b72a; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 1.5rem; font-size: 1rem; }
+        .btn:hover { background: #36a420; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.85rem; }
+        th { background: #f8f9fa; color: #606770; text-align: right; padding: 12px; border-bottom: 2px solid #ddd; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; color: white; }
+        .badge-blue { background: #1877f2; }
+        .badge-green { background: #42b72a; }
     </style>
 </head>
 <body>
 
-<div class="grid">
+<div class="navbar">
+    <div style="font-size: 1.5rem; font-weight: bold;">معهد الفتح - نظام الإدارة الذكي</div>
+    <div id="live-clock">00:00:00</div>
+</div>
+
+<div class="wrapper">
     <div class="sidebar">
         <div class="card">
-            <h3>⚙️ تحكم الذكاء والوقت</h3>
-            <label>وقت الفتح:</label> <input type="number" id="workStart" value="8">
-            <label>وقت الإغلاق:</label> <input type="number" id="workEnd" value="20">
-            <label>أمر الإغلاق (AI):</label>
-            <textarea id="aiCommand" rows="3"></textarea>
-            <label>ملاحظة ذكية (رد على العلامات):</label>
-            <textarea id="customNote" rows="2"></textarea>
-            <button onclick="saveConfig()">حفظ الإعدادات</button>
+            <h3>🎮 أوامر البوت الذكية</h3>
+            
+            <label>وصف حالة المعهد (يرسل للجميع):</label>
+            <textarea id="statusNote" rows="3" placeholder="مثلاً: المعهد مفتوح من 8 لـ 8"></textarea>
+            
+            <label>رسالة "المدير نائم":</label>
+            <textarea id="sleepResponse" rows="3"></textarea>
+            
+            <label>بنك المعلومات (الرد على العلامات والأسئلة):</label>
+            <textarea id="aiKnowledge" rows="4" placeholder="اكتب هنا أي معلومات تريد من البوت أن يعرفها ويجيب عليها..."></textarea>
+            
+            <div style="margin-top: 15px;">
+                <input type="checkbox" id="regToggle" style="width: auto;"> <label style="display: inline;">تفعيل نظام التسجيل</label>
+            </div>
+
+            <button class="btn" onclick="updateSystem()">حفظ وتحديث النظام 🚀</button>
         </div>
     </div>
 
     <div class="main">
         <div class="card">
-            <h3>👥 إدارة الطلاب المسجلين</h3>
+            <h3>📊 بيانات الطلاب المسجلين</h3>
             <table>
                 <thead>
                     <tr>
                         <th>الاسم</th>
-                        <th>السكن</th>
                         <th>المواليد</th>
-                        <th>الدراسة</th>
-                        <th>الوقت المفضل</th>
+                        <th>السكن</th>
+                        <th>الدراسة والعمل</th>
+                        <th>الدوام</th>
                         <th>الهاتف</th>
                     </tr>
                 </thead>
-                <tbody id="studentBody"></tbody>
+                <tbody id="regTable">
+                    </tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
-    async function loadAdmin() {
-        const res = await fetch('/api/admin');
+    async function fetchData() {
+        const res = await fetch('/api/system');
         const data = await res.json();
         
-        // تعبئة الإعدادات
-        document.getElementById('aiCommand').value = data.botConfig.aiCommand;
-        document.getElementById('customNote').value = data.botConfig.customNote;
-        
+        // تعبئة الحقول
+        document.getElementById('statusNote').value = data.botConfig.statusNote;
+        document.getElementById('sleepResponse').value = data.botConfig.sleepResponse;
+        document.getElementById('aiKnowledge').value = data.botConfig.aiKnowledge;
+        document.getElementById('regToggle').checked = data.botConfig.regToggle;
+
         // تعبئة الجدول
-        const tbody = document.getElementById('studentBody');
+        const tbody = document.getElementById('regTable');
         tbody.innerHTML = data.registrations.map(r => `
             <tr>
-                <td>${r.name}</td>
-                <td>${r.address}</td>
+                <td><b>${r.name}</b></td>
                 <td>${r.dob}</td>
+                <td>${r.address}</td>
                 <td>${r.job}</td>
-                <td>${r.timePref}</td>
+                <td><span class="badge ${r.timePref === 'صباحي' ? 'badge-blue' : 'badge-green'}">${r.timePref}</span></td>
                 <td>${r.phone.split('@')[0]}</td>
             </tr>
         `).join('');
     }
 
-    async function saveConfig() {
-        const config = {
-            workStart: parseInt(document.getElementById('workStart').value),
-            workEnd: parseInt(document.getElementById('workEnd').value),
-            aiCommand: document.getElementById('aiCommand').value,
-            customNote: document.getElementById('customNote').value
+    async function updateSystem() {
+        const payload = {
+            statusNote: document.getElementById('statusNote').value,
+            sleepResponse: document.getElementById('sleepResponse').value,
+            aiKnowledge: document.getElementById('aiKnowledge').value,
+            regToggle: document.getElementById('regToggle').checked
         };
-        await fetch('/api/config', {
+
+        const res = await fetch('/api/update-config', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(config)
+            body: JSON.stringify(payload)
         });
-        alert('تم الحفظ بنجاح!');
+        
+        if(res.ok) alert('✅ تم تحديث ذكاء البوت بنجاح!');
     }
 
-    setInterval(loadAdmin, 5000);
-    loadAdmin();
+    // تحديث الساعة والبيانات
+    setInterval(() => {
+        document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('ar-EG');
+    }, 1000);
+
+    setInterval(fetchData, 10000);
+    fetchData();
 </script>
 </body>
 </html>
