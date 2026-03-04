@@ -3,57 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة معهد الفتح | الإدارة الذكية</title>
+    <title>إدارة معهد الفتح | منصة الذكاء الاصطناعي</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #1877f2; --success: #28a745; --danger: #dc3545; --bg: #f4f6f9; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
-        .header { text-align: center; margin-bottom: 20px; color: var(--primary); }
-        .dashboard { display: grid; grid-template-columns: 380px 1fr; gap: 20px; max-width: 1400px; margin: auto; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 14px; }
-        textarea, input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; box-sizing: border-box; transition: 0.3s; }
-        textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 5px rgba(24,119,242,0.2); }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 16px; transition: 0.3s; }
-        .btn-save:hover { background: #155db1; transform: translateY(-2px); }
-        .btn-excel { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; }
-        .btn-excel:hover { background: #218838; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; background: white; }
-        th, td { border: 1px solid #eee; padding: 14px; text-align: right; }
-        th { background: #f8f9fa; color: #555; font-weight: 700; }
-        tr:hover { background: #f1f7fe; }
-        .ai-box { background: linear-gradient(145deg, #fff3cd, #ffebad); border: 1px solid #ffeeba; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        :root { --primary: #2b5797; --success: #1e7145; --danger: #ce1126; --bg: #f5f6fa; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #2d3436; }
+        .header { text-align: center; margin-bottom: 25px; color: var(--primary); }
+        .dashboard { display: grid; grid-template-columns: 420px 1fr; gap: 25px; max-width: 1450px; margin: auto; }
+        .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 12px; font-weight: 700; }
+        label { display: block; margin: 18px 0 8px; font-weight: 600; font-size: 15px; color: #34495e; }
+        textarea, input { width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-family: inherit; box-sizing: border-box; transition: 0.3s; font-size: 14px; }
+        textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(43,87,151,0.1); }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; transition: 0.3s; }
+        .btn-save:hover { background: #1a365d; transform: translateY(-2px); }
+        .btn-excel { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
+        .btn-excel:hover { background: #144d2f; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; background: white; border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid #ecf0f1; padding: 15px; text-align: right; }
+        th { background: #f8f9fa; color: #2c3e50; font-weight: 700; }
+        tr:hover { background: #fdfdfe; }
+        .ai-box { background: linear-gradient(135deg, #e0f7fa 0%, #e1bee7 100%); border: none; padding: 18px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .toggle-container { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(26px); }
         
-        @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
+        @media (max-width: 1000px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>معهد الفتح الخيري 🤖 (نظام الإدارة المدعوم بالذكاء الاصطناعي)</h1>
+    <h1>معهد الفتح الخيري 🎓 (منصة الإدارة والذكاء الاصطناعي)</h1>
 </div>
 
 <div class="dashboard">
     <div class="card sidebar">
-        <h3>🧠 مركز توجيه الذكاء الاصطناعي</h3>
+        <h3>🧠 مركز تدريب المساعد الذكي</h3>
+
+        <div class="toggle-container">
+            <div>
+                <strong style="color: var(--primary);">شخصية الذكاء الاصطناعي</strong>
+                <div style="font-size: 12px; color: #7f8c8d;">تفعيل أسلوب "السكرتير اللبق" والردود الذكية</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="aiEnabled">
+                <span class="slider"></span>
+            </label>
+        </div>
         
         <div class="ai-box">
-            <label style="color:#856404; margin-top:0;">🚨 لوحة الطوارئ (تتفاعل تلقائياً):</label>
-            <textarea id="announcement" rows="2" placeholder="اكتب هنا أي تحديث طارئ (مثال: لا يوجد تسجيل اليوم) وسيفهمه البوت تلقائياً.."></textarea>
-            <small style="color:#666; font-size:12px;">* البوت سيحلل هذا النص؛ إذا كتبت "لا يوجد تسجيل" سيقوم بإيقاف التسجيل تلقائياً والاعتذار للطلاب.</small>
+            <label style="color:#2c3e50; margin-top:0;">🤖 تدريب الأنماط (الكلمة = الرد):</label>
+            <textarea id="aiTraining" rows="4" placeholder="مثال:&#10;احبك = عذراً، أنا آلي لخدمة المعهد.&#10;فادي = يرجى التواصل مع المدير شخصياً."></textarea>
+            <small style="color:#5f27cd; font-size:12px; font-weight:600;">* علم البوت كيف يرد على كلمات محددة (تعمل فقط إذا كان الذكاء مفعلاً).</small>
         </div>
 
-        <label>👋 الرسالة الترحيبية الدائمة:</label>
-        <textarea id="welcomeMessage" rows="2"></textarea>
+        <label>🚨 لوحة الطوارئ والإعلانات (تتفاعل تلقائياً):</label>
+        <textarea id="announcement" rows="2" placeholder="اكتب تحديثاً (مثال: التسجيل مغلق اليوم) وسيفهمه البوت.."></textarea>
 
-        <label>📚 بنك المعلومات (تغذية الذكاء الاصطناعي):</label>
-        <textarea id="aiKnowledge" rows="6" placeholder="اكتب سطر لكل معلومة. مثال:&#10;الدورات: برمجة وتصميم"></textarea>
+        <label>📚 بنك معلومات المعهد الأساسية:</label>
+        <textarea id="aiKnowledge" rows="5" placeholder="سطر لكل معلومة.."></textarea>
         
-        <div style="margin-top: 20px; padding: 10px; background: #e7f3ff; border-radius: 8px;">
-            <input type="checkbox" id="regToggle" style="width:auto; transform: scale(1.2);"> 
-            <label style="display:inline; margin-right: 8px; font-size: 15px;">السماح بالتسجيل العام</label>
+        <div class="toggle-container" style="background: #f8fff9; border-color: #c3e6cb;">
+            <strong style="color: var(--success);">فتح باب التسجيل للطلاب</strong>
+            <label class="switch">
+                <input type="checkbox" id="regToggle">
+                <span class="slider" style="background-color: #ccc;"></span>
+            </label>
         </div>
 
         <button class="btn-save" onclick="saveConfig()">حفظ البيانات وتلقين البوت 🚀</button>
@@ -62,7 +83,7 @@
     <div class="card main">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3>📊 قاعدة بيانات الطلاب (تزامن لحظي)</h3>
-            <button class="btn-excel" onclick="exportToExcel()">تصدير إلى Excel 📥</button>
+            <button class="btn-excel" onclick="exportToExcel()">تصدير Excel 📥</button>
         </div>
         
         <div style="overflow-x:auto;">
@@ -70,16 +91,16 @@
                 <thead>
                     <tr>
                         <th>الاسم الثلاثي</th>
-                        <th>العمر (دقيق)</th>
+                        <th>العمر</th>
                         <th>سنة التولد</th>
                         <th>العمل</th>
                         <th>الدراسة</th>
-                        <th>رقم الواتساب</th>
-                        <th>وقت التسجيل</th>
+                        <th>الواتساب</th>
+                        <th>التسجيل</th>
                     </tr>
                 </thead>
                 <tbody id="regTable">
-                    <tr><td colspan="7" style="text-align:center;">جاري جلب البيانات المتزامنة...</td></tr>
+                    <tr><td colspan="7" style="text-align:center;">جاري الاتصال بالسيرفر...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -95,32 +116,32 @@
             const data = await res.json();
             currentRegs = data.registrations;
             
-            // تحديث الحقول فقط إذا كان المدير لا يكتب بداخلها (لمنع مسح الكتابة)
+            // تحديث الحقول فقط إذا كان المدير لا يكتب بداخلها
             if (document.activeElement.tagName !== "TEXTAREA" && document.activeElement.tagName !== "INPUT") {
+                document.getElementById('aiEnabled').checked = data.botConfig.aiEnabled;
+                document.getElementById('aiTraining').value = data.botConfig.aiTraining || "";
                 document.getElementById('announcement').value = data.botConfig.announcement || "";
-                document.getElementById('welcomeMessage').value = data.botConfig.welcomeMessage;
                 document.getElementById('aiKnowledge').value = data.botConfig.aiKnowledge;
                 document.getElementById('regToggle').checked = data.botConfig.regToggle;
             }
 
-            // رسم الجدول بتزامن تام مع البيانات القادمة من الواتساب
             const tbody = document.getElementById('regTable');
             if (currentRegs.length > 0) {
                 tbody.innerHTML = currentRegs.slice().reverse().map(r => `
                     <tr>
-                        <td><b>${r.name}</b></td>
+                        <td style="font-weight:700;">${r.name}</td>
                         <td style="color:var(--primary); font-weight:bold;">${r.age} سنة</td>
                         <td>${r.birthYear}</td>
                         <td>${r.job}</td>
                         <td>${r.study}</td>
-                        <td dir="ltr" style="text-align:right;"><a href="https://wa.me/${r.phone.split('@')[0]}" target="_blank" style="text-decoration:none; color:inherit;">${r.phone.split('@')[0]}</a></td>
-                        <td style="font-size:12px; color:#777;">${r.regDate}</td>
+                        <td dir="ltr" style="text-align:right;"><a href="https://wa.me/${r.phone.split('@')[0]}" target="_blank" style="text-decoration:none; color:var(--primary);">${r.phone.split('@')[0]}</a></td>
+                        <td style="font-size:12px; color:#7f8c8d;">${r.regDate}</td>
                     </tr>
                 `).join('');
             } else {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#999;">المنظومة جاهزة بانتظار أول طالب...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#95a5a6;">النظام جاهز بانتظار تسجيل الطلاب...</td></tr>';
             }
-        } catch (err) { console.error("Sync Error:", err); }
+        } catch (err) { console.error("Sync Error"); }
     }
 
     function exportToExcel() {
@@ -137,13 +158,14 @@
         const ws = XLSX.utils.json_to_sheet(dataForExcel);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "طلاب المعهد");
-        XLSX.writeFile(wb, "طلاب_معهد_الفتح.xlsx");
+        XLSX.writeFile(wb, "سجل_معهد_الفتح.xlsx");
     }
 
     async function saveConfig() {
         const payload = { 
+            aiEnabled: document.getElementById('aiEnabled').checked,
+            aiTraining: document.getElementById('aiTraining').value,
             announcement: document.getElementById('announcement').value,
-            welcomeMessage: document.getElementById('welcomeMessage').value,
             aiKnowledge: document.getElementById('aiKnowledge').value,
             regToggle: document.getElementById('regToggle').checked
         };
@@ -152,11 +174,11 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         });
-        alert('🤖 تم تلقين الذكاء الاصطناعي بالأوامر الجديدة بنجاح!');
+        alert('🤖 تم تلقين وتحديث المساعد الذكي بنجاح!');
         fetchData();
     }
 
-    // تزامن سريع جداً كل ثانيتين
+    // تزامن البيانات
     setInterval(fetchData, 2000);
     fetchData();
 </script>
