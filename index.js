@@ -10,11 +10,11 @@ const TOKEN = process.env.USERINTERMIX_TOKEN || 'p28vl0vdx1g74qyd';
 
 let registrations = []; 
 let userState = {}; 
-let dailyWelcome = {}; // لحفظ الأرقام التي تلقت ترحيباً اليوم
+let dailyWelcome = {}; 
 
 let botConfig = {
     welcomeMessage: "للمعلومات أرسل كلمة *معلومات*.\nللتسجيل أرسل كلمة *تسجيل*.",
-    announcement: "", // خانة الإعلانات الطارئة (مثال: لا يوجد تسجيل اليوم)
+    announcement: "", // لوحة الطوارئ الذكية
     aiKnowledge: "المدير: فادي علي الهندي\nالجمعية: قطيع فاميلي فاونديشن\nالتواصل: 00963959809700\nالدورات: ICDL، برمجة، تصميم، محادثة إنجليزية، تاسع، بكالوريا\nالتكلفة: المعهد مجاني بالكامل",
     regToggle: true
 };
@@ -34,87 +34,92 @@ app.post('/webhook', async (req, res) => {
     const lowerText = text.toLowerCase();
     const today = new Date().toDateString();
 
-    // فحص ما إذا كان المستخدم مسجلاً مسبقاً (للذاكرة الدائمة)
     const registeredUser = registrations.find(r => r.phone === from);
 
-    // 1. إذا كان الطالب في منتصف محادثة التسجيل (أولوية قصوى)
+    // 1. أولوية قصوى: إكمال التسجيل إذا كان المستخدم في منتصف العملية
     if (userState[from]) {
         return handleRegistration(from, text);
     }
 
-    // 2. طلب التسجيل
-    if (lowerText === "تسجيل" || lowerText === "سجلني") {
-        if (!botConfig.regToggle) return sendWH(from, "🛑 *عذراً*\nالتسجيل مغلق حالياً بقرار من الإدارة.");
-        if (registeredUser) return sendWH(from, `أهلاً بك يا *${registeredUser.name.split(' ')[0]}*! 🌟\nأنت مسجل لدينا بالفعل، ولا يسمح بالتسجيل المزدوج من نفس الرقم.`);
+    // --- منطق الذكاء الاصطناعي في تحليل الرسالة (AI Intent Parsing) ---
+    
+    const isRegisterRequest = lowerText.includes("تسجيل") || lowerText.includes("سجلني");
+    const isInfoRequest = lowerText.includes("معلومات") || lowerText.includes("تفاصيل");
+    const isGreeting = ["سلام", "مرحبا", "هلا", "مرحباً", "السلام عليكم", "مساء الخير", "صباح الخير"].some(w => lowerText.includes(w));
+    
+    // 2. معالجة طلب التسجيل بذكاء
+    if (isRegisterRequest) {
+        // الذكاء الاصطناعي يقرأ لوحة الطوارئ: هل هناك منع للتسجيل؟
+        const ann = botConfig.announcement.toLowerCase();
+        if (ann.includes("لا يوجد تسجيل") || ann.includes("مغلق") || ann.includes("توقف") || !botConfig.regToggle) {
+            return sendWH(from, `🤖 *مرحباً بك!*\nنعتذر منك، ولكن حسب تعليمات الإدارة:\n"${botConfig.announcement || 'التسجيل مغلق حالياً.'}"\n\nيرجى المحاولة لاحقاً.`);
+        }
+
+        if (registeredUser) {
+            return sendWH(from, `🤖 أهلاً بك يا *${registeredUser.name.split(' ')[0]}*!\nلقد قمت بالتسجيل مسبقاً، ولا يمكن تسجيل شخصين من نفس الرقم لحماية البيانات.`);
+        }
         
         userState[from] = { step: 1 };
-        let msg = "📝 *نظام التسجيل | معهد الفتح*\n\nيرجى إرسال *الاسم الثلاثي* حصراً (الاسم، الأب، الكنية):";
-        if (botConfig.announcement) msg = `📢 *تنويه:* ${botConfig.announcement}\n\n` + msg;
+        let msg = "📝 *نظام التسجيل الذكي | معهد الفتح*\n\nيرجى إرسال *الاسم الثلاثي* حصراً (الاسم، الأب، الكنية):";
         return sendWH(from, msg);
     }
 
-    // 3. طلب المعلومات الشاملة
-    if (lowerText === "معلومات") {
-        let info = botConfig.announcement ? `📢 *إعلان:* ${botConfig.announcement}\n\n` : "";
-        info += `🏢 *معلومات المعهد:*\n\n` + botConfig.aiKnowledge;
+    // 3. معالجة طلب المعلومات
+    if (isInfoRequest) {
+        let prefix = registeredUser ? `أهلاً بك يا *${registeredUser.name.split(' ')[0]}*، ` : "";
+        let info = botConfig.announcement ? `📢 *إعلان هام:* ${botConfig.announcement}\n\n` : "";
+        info += `🏢 ${prefix}إليك *معلومات المعهد:*\n\n` + botConfig.aiKnowledge;
         return sendWH(from, info);
     }
 
-    // 4. البحث الذكي في بنك المعلومات (يجيب فقط على السؤال)
+    // 4. الذكاء الاصطناعي يبحث في بنك المعلومات عن إجابة محددة
     const infoLines = botConfig.aiKnowledge.split('\n');
     for (let line of infoLines) {
-        const keywords = line.split(':')[0].trim();
-        if (text.includes(keywords) || (line.toLowerCase().includes(lowerText) && text.length > 3)) {
-            return sendWH(from, `💡 *بخصوص استفسارك:*\n${line}`);
+        const keyword = line.split(':')[0].trim();
+        if (lowerText.includes(keyword) && keyword.length > 2) {
+            let prefix = registeredUser ? `يا *${registeredUser.name.split(' ')[0]}*، ` : "";
+            return sendWH(from, `💡 ${prefix}بخصوص استفسارك:\n${line}`);
         }
     }
 
-    // 5. الترحيب الذكي (مرة واحدة يومياً، أو عند بدء الحديث)
-    let isGreeting = ["سلام", "مرحبا", "هلا", "مرحباً", "السلام عليكم"].some(w => lowerText.includes(w));
-    if (dailyWelcome[from] !== today || isGreeting) {
+    // 5. الرد على التحية (مرة واحدة يومياً لتجنب الإزعاج)
+    if (isGreeting && dailyWelcome[from] !== today) {
         dailyWelcome[from] = today; 
-
-        if (registeredUser) {
-            // ترحيب مخصص للشخص المسجل
-            let msg = `أهلاً بك من جديد يا *${registeredUser.name.split(' ')[0]}*! 🌹\nكيف يمكنني مساعدتك اليوم؟\n\n(للاستعلام، أرسل سؤالك أو أرسل كلمة *معلومات*)`;
-            if (botConfig.announcement) msg = `📢 *تنويه هام:* ${botConfig.announcement}\n\n` + msg;
-            return sendWH(from, msg);
-        } else {
-            // ترحيب للشخص الجديد
-            let msg = `مرحباً بك في *معهد الفتح الخيري* 🎓\n\n`;
-            if (botConfig.announcement) msg += `📢 *إعلان الإدارة:* ${botConfig.announcement}\n\n`;
-            msg += botConfig.welcomeMessage;
-            return sendWH(from, msg);
-        }
+        let prefix = registeredUser ? `أهلاً بك من جديد يا *${registeredUser.name.split(' ')[0]}*! 🌹\n` : `مرحباً بك في *معهد الفتح الخيري* 🎓\n`;
+        let msg = prefix;
+        if (botConfig.announcement) msg += `📢 *إعلان الإدارة:* ${botConfig.announcement}\n\n`;
+        msg += botConfig.welcomeMessage;
+        return sendWH(from, msg);
     }
 
+    // إذا لم تكن الرسالة أي شيء مما سبق (مثل إرسال "شكرا")، يصمت البوت تماماً.
     res.send('ok');
 });
 
-// دالة معالجة التسجيل الذكية
+// دالة التسجيل (صارمة وذكية)
 async function handleRegistration(from, text) {
     let state = userState[from];
     try {
         switch(state.step) {
-            case 1: // فحص الاسم الثلاثي
+            case 1: 
                 const nameParts = text.trim().split(/\s+/);
                 if (nameParts.length < 3) {
-                    return sendWH(from, "⚠️ *عذراً:*\nيجب إرسال *الاسم الثلاثي* بشكل كامل لتأكيد التسجيل.\nيرجى إعادة كتابة اسمك الثلاثي:");
+                    return sendWH(from, "⚠️ *عذراً:*\nالنظام لا يقبل إلا *الاسم الثلاثي* لضمان الدقة.\nيرجى إرسال اسمك الثلاثي كاملاً:");
                 }
                 state.name = text; state.step = 2;
-                await sendWH(from, "✨ *ممتاز!*\nالآن أرسل *سنة التولد* الخاص بك (مثال: 2008):");
+                await sendWH(from, "✨ *ممتاز!*\nالآن أرسل *سنة التولد* الخاص بك (أرقام فقط، مثال: 2008):");
                 break;
 
-            case 2: // حساب العمر وفلترة الصغار
+            case 2: 
                 const year = parseInt(text);
                 const currentYear = new Date().getFullYear();
                 if (isNaN(year) || year < 1950 || year > currentYear) {
-                    return sendWH(from, "⚠️ *خطأ:*\nيرجى إرسال *سنة التولد* بشكل صحيح (أرقام فقط):");
+                    return sendWH(from, "⚠️ *تنبيه:*\nيرجى إرسال *سنة التولد* بشكل صحيح (أرقام فقط):");
                 }
                 const age = currentYear - year;
                 if (age < 11) {
-                    await sendWH(from, "🛑 *نعتذر منك:*\nمعهد الفتح مخصص للطلاب الذين تتجاوز أعمارهم *11 عاماً*.\nشكراً لتواصلك معنا، ونتمنى لك التوفيق!");
-                    delete userState[from]; // إلغاء التسجيل
+                    await sendWH(from, "🛑 *نعتذر منك:*\nقوانين المعهد تقتصر على الطلاب الذين تتجاوز أعمارهم *11 عاماً*.\nنتمنى لك التوفيق!");
+                    delete userState[from]; 
                     return;
                 }
                 state.birthYear = year;
@@ -125,27 +130,26 @@ async function handleRegistration(from, text) {
 
             case 3:
                 state.job = text; state.step = 4;
-                await sendWH(from, "📚 ما هي *دراستك الحالية* أو آخر تحصيل علمي؟");
+                await sendWH(from, "📚 ما هي *دراستك الحالية* أو آخر تحصيل علمي لك؟");
                 break;
 
             case 4:
                 state.study = text;
-                state.phone = from; // سحب الرقم تلقائياً
+                state.phone = from; // سحب الرقم لمعالجة التزامن بشكل سليم
                 state.regDate = new Date().toLocaleString('ar-EG');
                 
-                // حفظ البيانات 
                 registrations.push({...state});
-                delete userState[from]; // إنهاء المحادثة ليصمت البوت
+                delete userState[from]; 
                 
                 const successMsg = `✅ *تم التسجيل بنجاح!*\n\n` +
                                    `👤 *الاسم:* ${state.name}\n` +
                                    `🎂 *العمر:* ${state.age} سنة\n\n` +
-                                   `سعداء بانضمامك لنا يا *${state.name.split(' ')[0]}*! 🌹\nسيتم التواصل معك على هذا الرقم عند الحاجة.`;
+                                   `سعداء بانضمامك يا *${state.name.split(' ')[0]}*! 🌹\nلن نقوم بإزعاجك برسائل تلقائية، سيتم التواصل معك فقط عند الضرورة.`;
                 await sendWH(from, successMsg);
                 break;
         }
     } catch (e) { 
-        console.error(e);
+        console.error("Registration Error", e);
         delete userState[from]; 
     }
 }
@@ -158,4 +162,4 @@ async function sendWH(to, body) {
     } catch (e) { console.log("API Error"); }
 }
 
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 3000, () => console.log("AI Server Running"));
