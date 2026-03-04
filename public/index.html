@@ -10,7 +10,7 @@
         :root { --primary: #2b5797; --success: #1e7145; --danger: #ce1126; --bg: #f5f6fa; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #2d3436; }
         .header { text-align: center; margin-bottom: 25px; color: var(--primary); }
-        .dashboard { display: grid; grid-template-columns: 420px 1fr; gap: 25px; max-width: 1450px; margin: auto; }
+        .dashboard { display: grid; grid-template-columns: 450px 1fr; gap: 25px; max-width: 1500px; margin: auto; }
         .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 12px; font-weight: 700; }
         label { display: block; margin: 18px 0 8px; font-weight: 600; font-size: 15px; color: #34495e; }
@@ -48,8 +48,8 @@
 
         <div class="toggle-container">
             <div>
-                <strong style="color: var(--primary);">شخصية الذكاء الاصطناعي</strong>
-                <div style="font-size: 12px; color: #7f8c8d;">تفعيل أسلوب "السكرتير اللبق" والردود الذكية</div>
+                <strong style="color: var(--primary);">تشغيل المساعد الذكي (AI Persona)</strong>
+                <div style="font-size: 12px; color: #7f8c8d;">تفعيل شخصية السكرتير اللبق للإجابة على الأسئلة</div>
             </div>
             <label class="switch">
                 <input type="checkbox" id="aiEnabled">
@@ -59,15 +59,18 @@
         
         <div class="ai-box">
             <label style="color:#2c3e50; margin-top:0;">🤖 تدريب الأنماط (الكلمة = الرد):</label>
-            <textarea id="aiTraining" rows="4" placeholder="مثال:&#10;احبك = عذراً، أنا آلي لخدمة المعهد.&#10;فادي = يرجى التواصل مع المدير شخصياً."></textarea>
-            <small style="color:#5f27cd; font-size:12px; font-weight:600;">* علم البوت كيف يرد على كلمات محددة (تعمل فقط إذا كان الذكاء مفعلاً).</small>
+            <textarea id="aiTraining" rows="4" placeholder="اكتب الكلمة ومقابلها الرد.."></textarea>
+            <small style="color:#5f27cd; font-size:12px; font-weight:600;">* علم البوت الرد المخصص. مثال: احبك = شكراً أنا مجرد بوت.</small>
         </div>
 
-        <label>🚨 لوحة الطوارئ والإعلانات (تتفاعل تلقائياً):</label>
-        <textarea id="announcement" rows="2" placeholder="اكتب تحديثاً (مثال: التسجيل مغلق اليوم) وسيفهمه البوت.."></textarea>
+        <label>🚨 لوحة الطوارئ والإعلانات:</label>
+        <textarea id="announcement" rows="2" placeholder="اكتب تحديثاً (مثال: التسجيل مغلق اليوم) وسيطبقه البوت فوراً.."></textarea>
 
-        <label>📚 بنك معلومات المعهد الأساسية:</label>
+        <label>📚 بنك معلومات المعهد (للرد على الأسئلة):</label>
         <textarea id="aiKnowledge" rows="5" placeholder="سطر لكل معلومة.."></textarea>
+
+        <label>👋 رسالة الترحيب الافتراضية:</label>
+        <textarea id="welcomeMessage" rows="2"></textarea>
         
         <div class="toggle-container" style="background: #f8fff9; border-color: #c3e6cb;">
             <strong style="color: var(--success);">فتح باب التسجيل للطلاب</strong>
@@ -116,12 +119,12 @@
             const data = await res.json();
             currentRegs = data.registrations;
             
-            // تحديث الحقول فقط إذا كان المدير لا يكتب بداخلها
             if (document.activeElement.tagName !== "TEXTAREA" && document.activeElement.tagName !== "INPUT") {
                 document.getElementById('aiEnabled').checked = data.botConfig.aiEnabled;
                 document.getElementById('aiTraining').value = data.botConfig.aiTraining || "";
                 document.getElementById('announcement').value = data.botConfig.announcement || "";
-                document.getElementById('aiKnowledge').value = data.botConfig.aiKnowledge;
+                document.getElementById('aiKnowledge').value = data.botConfig.aiKnowledge || "";
+                document.getElementById('welcomeMessage').value = data.botConfig.welcomeMessage || "";
                 document.getElementById('regToggle').checked = data.botConfig.regToggle;
             }
 
@@ -133,7 +136,7 @@
                         <td style="color:var(--primary); font-weight:bold;">${r.age} سنة</td>
                         <td>${r.birthYear}</td>
                         <td>${r.job}</td>
-                        <td>${r.study}</td>
+                        <td style="color:#27ae60; font-weight:bold;">${r.study}</td>
                         <td dir="ltr" style="text-align:right;"><a href="https://wa.me/${r.phone.split('@')[0]}" target="_blank" style="text-decoration:none; color:var(--primary);">${r.phone.split('@')[0]}</a></td>
                         <td style="font-size:12px; color:#7f8c8d;">${r.regDate}</td>
                     </tr>
@@ -148,12 +151,12 @@
         if(currentRegs.length === 0) return alert("لا يوجد بيانات لتصديرها");
         const dataForExcel = currentRegs.map(r => ({
             "الاسم الثلاثي": r.name,
-            "العمر المحسوب": r.age,
+            "العمر": r.age,
             "سنة التولد": r.birthYear,
             "العمل الحالي": r.job,
             "التحصيل الدراسي": r.study,
             "رقم الواتساب": r.phone.split('@')[0],
-            "تاريخ ووقت التسجيل": r.regDate
+            "تاريخ التسجيل": r.regDate
         }));
         const ws = XLSX.utils.json_to_sheet(dataForExcel);
         const wb = XLSX.utils.book_new();
@@ -167,6 +170,7 @@
             aiTraining: document.getElementById('aiTraining').value,
             announcement: document.getElementById('announcement').value,
             aiKnowledge: document.getElementById('aiKnowledge').value,
+            welcomeMessage: document.getElementById('welcomeMessage').value,
             regToggle: document.getElementById('regToggle').checked
         };
         await fetch('/api/update-config', {
@@ -178,7 +182,6 @@
         fetchData();
     }
 
-    // تزامن البيانات
     setInterval(fetchData, 2000);
     fetchData();
 </script>
