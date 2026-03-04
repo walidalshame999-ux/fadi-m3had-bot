@@ -7,17 +7,21 @@ app.use(express.static('public'));
 
 const INSTANCE_ID = process.env.INSTANCE_ID || 'instance163781';
 const TOKEN = process.env.USERINTERMIX_TOKEN || 'p28vl0vdx1g74qyd';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyAWG-wcbGfCjN9M6TVXZ2dthKuZi7ilG5w';
 
 let registrations = []; 
 let userState = {}; 
 let dailyWelcome = {}; 
 
+// إعدادات البوت والذكاء الاصطناعي
 let botConfig = {
-    aiEnabled: true,
+    geminiEnabled: true, // الذكاء الاصطناعي التوليدي (جوجل)
+    miniAiEnabled: true, // الذكاء الاصطناعي المصغر (الأنماط)
+    geminiPrompt: "أنت سكرتير لبق ومحترف جداً تعمل في معهد الفتح الخيري. اسمك 'المساعد الذكي'. أجب على أسئلة الطلاب بحدود المعلومات المتوفرة لديك فقط. كن ودوداً ومختصراً ولا تؤلف معلومات غير موجودة.",
     announcement: "", 
     aiKnowledge: "المدير: فادي علي الهندي\nالجمعية: قطيع فاميلي فاونديشن\nالتواصل: 00963959809700\nالدورات: ICDL، برمجة، تصميم، لغة إنجليزية، تاسع، بكالوريا\nالتكلفة: المعهد مجاني بالكامل",
     aiTraining: "احبك = شكراً لمشاعرك اللطيفة، ولكنني مجرد مساعد آلي مخصص لخدمات معهد الفتح.\nفادي = أعتذر منك، لا يمكنني مشاركة معلومات شخصية عن مدير المعهد. يرجى التواصل معه مباشرة.",
-    welcomeMessage: "للتسجيل معنا، أرسل كلمة *تسجيل*.\nللتحدث معي وطرح أي استفسار، أرسل كلمة *سؤال* متبوعة باستفسارك.",
+    welcomeMessage: "للتسجيل معنا، أرسل كلمة *تسجيل*.\nللتحدث مع الذكاء الاصطناعي وطرح أي استفسار، أرسل كلمة *سؤال* متبوعة باستفسارك.",
     regToggle: true
 };
 
@@ -28,8 +32,11 @@ app.post('/api/update-config', (req, res) => {
 });
 
 app.post('/webhook', async (req, res) => {
+    // 🔴 الحل السحري لمشكلة التكرار: إرسال (OK) فوراً لـ UltraMsg لكي لا يعيد إرسال الرسالة
+    res.status(200).send('ok');
+
     const data = req.body.data || req.body;
-    if (!data || data.fromMe || !data.body) return res.send('ok');
+    if (!data || data.fromMe || !data.body) return;
 
     const from = data.from;
     const text = data.body.trim();
@@ -38,17 +45,17 @@ app.post('/webhook', async (req, res) => {
 
     const registeredUser = registrations.find(r => r.phone === from);
 
-    // 1. أولوية قصوى: إذا كان المستخدم يسجل بياناته (يجب ألا يتدخل الذكاء الاصطناعي هنا)
+    // 1. إكمال التسجيل (أولوية قصوى ولا يتدخل فيها الذكاء الاصطناعي)
     if (userState[from]) {
         return handleRegistration(from, text);
     }
 
-    // --- تحليل نوايا المستخدم (Intent Parsing) ---
+    // --- تحليل النوايا ---
     const isRegisterRequest = lowerText === "تسجيل" || lowerText === "سجلني";
     const isAiQuestion = lowerText.startsWith("سؤال") || lowerText.startsWith("ذكاء");
     const isGreeting = ["سلام", "مرحبا", "هلا", "السلام عليكم", "صباح"].some(w => lowerText.includes(w)) && text.length < 20;
 
-    // 2. معالجة طلب التسجيل
+    // 2. معالجة التسجيل
     if (isRegisterRequest) {
         if (!botConfig.regToggle || botConfig.announcement.includes("لا يوجد تسجيل") || botConfig.announcement.includes("مغلق")) {
             return sendWH(from, `🤖 *مرحباً بك!*\nنعتذر منك، ولكن حسب تعليمات الإدارة:\n"${botConfig.announcement || 'التسجيل مغلق حالياً.'}"\n\nيرجى المحاولة لاحقاً.`);
@@ -61,45 +68,66 @@ app.post('/webhook', async (req, res) => {
         return sendWH(from, "📝 *نظام التسجيل الذكي | معهد الفتح*\n\nيرجى التكرم بإرسال *الاسم الثلاثي* حصراً (الاسم، الأب، الكنية):");
     }
 
-    // 3. معالجة محادثة الذكاء الاصطناعي (عندما يرسل المستخدم "سؤال ...")
-    if (isAiQuestion && botConfig.aiEnabled) {
+    // 3. التحدث مع الذكاء الاصطناعي (Gemini أو Mini-AI)
+    if (isAiQuestion) {
         let questionText = lowerText.replace("سؤال", "").replace("ذكاء", "").trim();
         let prefix = registeredUser ? `أهلاً بك يا *${registeredUser.name.split(' ')[0]}*، ` : "أهلاً بك، ";
-        let intro = `🤖 *المساعد الذكي لمعهد الفتح:*\n${prefix}`;
+        let intro = `🤖 *المساعد الذكي:*\n`;
 
         if (questionText === "") {
-            return sendWH(from, `${intro}أنا هنا للإجابة على استفساراتك. أرسل كلمة *سؤال* متبوعة بما تريد معرفته.`);
+            return sendWH(from, `${intro}${prefix}أنا هنا للإجابة على استفساراتك. أرسل كلمة *سؤال* متبوعة بما تريد معرفته.`);
         }
 
-        // أ- البحث في التدريب المخصص (AI Training)
-        if (botConfig.aiTraining) {
-            const trainingLines = botConfig.aiTraining.split('\n');
-            for (let line of trainingLines) {
-                if (line.includes('=')) {
-                    let [trigger, response] = line.split('=');
-                    if (questionText.includes(trigger.trim().toLowerCase())) {
-                        return sendWH(from, `${intro}\n${response.trim()}`);
+        // أ- محاولة الرد عبر Gemini (الذكاء التوليدي)
+        if (botConfig.geminiEnabled) {
+            try {
+                // إرسال التعليمات + بنك المعلومات + التدريب الخاص + سؤال الطالب إلى Gemini
+                const prompt = `${botConfig.geminiPrompt}\n\nمعلومات المعهد التي يجب أن تعتمد عليها:\n${botConfig.aiKnowledge}\n\nتعليمات صارمة للرد (إن سئلت عنها):\n${botConfig.aiTraining}\n\nإعلانات طارئة (أخبر الطالب بها إن لزم الأمر):\n${botConfig.announcement}\n\nسؤال الطالب:\n${questionText}`;
+                
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+                const response = await axios.post(url, { contents: [{ parts: [{ text: prompt }] }] });
+                
+                let geminiReply = response.data.candidates[0].content.parts[0].text;
+                return sendWH(from, `${intro}${geminiReply}`);
+            } catch (error) {
+                console.error("Gemini API Error:", error.message);
+                // إذا فشل Gemini، ننتقل للذكاء المصغر كخطة بديلة
+            }
+        }
+
+        // ب- الرد عبر الذكاء المصغر (الأنماط) إذا كان Gemini مغلقاً أو فشل
+        if (botConfig.miniAiEnabled) {
+            if (botConfig.aiTraining) {
+                const trainingLines = botConfig.aiTraining.split('\n');
+                for (let line of trainingLines) {
+                    if (line.includes('=')) {
+                        let [trigger, response] = line.split('=');
+                        if (questionText.includes(trigger.trim().toLowerCase())) {
+                            return sendWH(from, `${intro}${response.trim()}`);
+                        }
+                    }
+                }
+            }
+            if (botConfig.aiKnowledge) {
+                const infoLines = botConfig.aiKnowledge.split('\n');
+                for (let line of infoLines) {
+                    const keyword = line.split(':')[0].trim().toLowerCase();
+                    if (questionText.includes(keyword) && keyword.length > 2) {
+                        return sendWH(from, `${intro}بخصوص استفسارك:\n💡 *${line}*`);
                     }
                 }
             }
         }
 
-        // ب- البحث في بنك المعلومات (AI Knowledge)
-        if (botConfig.aiKnowledge) {
-            const infoLines = botConfig.aiKnowledge.split('\n');
-            for (let line of infoLines) {
-                const keyword = line.split(':')[0].trim().toLowerCase();
-                if (questionText.includes(keyword) && keyword.length > 2) {
-                    return sendWH(from, `${intro}بخصوص استفسارك:\n💡 *${line}*`);
-                }
-            }
+        // ج- في حال لم يفهم أو كانت جميع الأنظمة مغلقة
+        if (!botConfig.geminiEnabled && !botConfig.miniAiEnabled) {
+            return sendWH(from, `${intro}عذراً، نظام الذكاء الاصطناعي متوقف حالياً للصيانة.`);
+        } else {
+            return sendWH(from, `${intro}عذراً، لم أتمكن من العثور على إجابة دقيقة. يرجى توضيح السؤال أو التواصل مع الإدارة.`);
         }
-
-        // ج- رد الذكاء الاصطناعي في حال عدم الفهم (اللباقة)
-        return sendWH(from, `${intro}عذراً، لم أتمكن من العثور على إجابة دقيقة لاستفسارك في قاعدة بياناتي. يرجى توضيح السؤال أو التواصل مع الإدارة.`);
     }
 
-    // 4. الترحيب (مرة واحدة في اليوم فقط لمنع الإزعاج)
+    // 4. الترحيب الافتراضي
     if (isGreeting && dailyWelcome[from] !== today) {
         dailyWelcome[from] = today; 
         let msg = `🎓 *معهد الفتح الخيري*\nأهلاً بك، أنا المساعد الذكي للمعهد.\n\n`;
@@ -108,12 +136,9 @@ app.post('/webhook', async (req, res) => {
         msg += botConfig.welcomeMessage;
         return sendWH(from, msg);
     }
-
-    // صمت مطبق (لا رسائل مزعجة إذا أرسل كلاماً عادياً)
-    res.send('ok');
 });
 
-// معالجة خطوات التسجيل بصرامة ودقة
+// دالة معالجة التسجيل
 async function handleRegistration(from, text) {
     let state = userState[from];
     try {
@@ -131,7 +156,7 @@ async function handleRegistration(from, text) {
                 const year = parseInt(text);
                 const currentYear = new Date().getFullYear();
                 if (isNaN(year) || year < 1950 || year > currentYear) {
-                    return sendWH(from, "⚠️ *خطأ في الإدخال:*\nيرجى إرسال *سنة التولد* بشكل صحيح (أرقام فقط):");
+                    return sendWH(from, "⚠️ *خطأ في الإدخال:*\nيرجى إرسال *سنة التولد* بشكل صحيح (يجب أن تحتوي على أرقام فقط مثل 2005):");
                 }
                 const age = currentYear - year;
                 if (age < 11) {
@@ -164,7 +189,7 @@ async function handleRegistration(from, text) {
                                  `💼 *العمل:* ${state.job}\n` +
                                  `🎓 *الدراسة:* ${state.study}\n\n`;
                 
-                if (botConfig.aiEnabled) {
+                if (botConfig.geminiEnabled || botConfig.miniAiEnabled) {
                     successMsg += `🤖 سعدت جداً بخدمتك يا *${state.name.split(' ')[0]}*! 🌹\nسأصمت الآن ولن أزعجك بأي رسائل تلقائية، وسيقوم المعهد بالتواصل معك قريباً.`;
                 } else {
                     successMsg += `تم حفظ البيانات بنجاح.`;
@@ -186,4 +211,4 @@ async function sendWH(to, body) {
     } catch (e) { console.log("API Error"); }
 }
 
-app.listen(process.env.PORT || 3000, () => console.log("AI Server Online"));
+app.listen(process.env.PORT || 3000, () => console.log("Gemini AI Server Online"));
