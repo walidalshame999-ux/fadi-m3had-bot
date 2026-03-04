@@ -32,7 +32,7 @@ app.post('/api/update-config', (req, res) => {
 });
 
 app.post('/webhook', async (req, res) => {
-    // 🔴 الحل السحري لمشكلة التكرار: إرسال (OK) فوراً لـ UltraMsg لكي لا يعيد إرسال الرسالة
+    // 🔴 الحل النهائي لمنع UltraMsg من تكرار الرسائل وتخطي الأسئلة
     res.status(200).send('ok');
 
     const data = req.body.data || req.body;
