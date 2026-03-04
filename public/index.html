@@ -2,89 +2,96 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة طلاب معهد الفتح</title>
+    <title>الإدارة العامة - معهد الفتح</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f3; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; }
-        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
-        table { width: 100%; background: white; border-collapse: collapse; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        th, td { padding: 15px; text-align: right; border-bottom: 1px solid #ddd; }
-        th { background: #34495e; color: white; }
-        tr:hover { background: #f9f9f9; }
-        .status-open { color: #27ae60; font-weight: bold; }
-        .status-sleep { color: #e67e22; font-weight: bold; }
-        .refresh-btn { background: #2980b9; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; }
+        :root { --primary: #2c3e50; --accent: #2980b9; }
+        body { font-family: 'Cairo', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; direction: rtl; }
+        .grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px; border: 1px solid #eee; text-align: right; }
+        th { background: var(--primary); color: white; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>نظام معهد الفتح الخيري 🤖</h1>
-        <p>متابعة طلبات التسجيل والرد الآلي</p>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <h3>حالة البوت الآن</h3>
-            <div id="botStatus" class="">جاري التحقق...</div>
-        </div>
-        <div class="stat-card">
-            <h3>إجمالي المسجلين</h3>
-            <div id="regCount" style="font-size: 24px; font-weight: bold;">0</div>
+<div class="grid">
+    <div class="sidebar">
+        <div class="card">
+            <h3>⚙️ تحكم الذكاء والوقت</h3>
+            <label>وقت الفتح:</label> <input type="number" id="workStart" value="8">
+            <label>وقت الإغلاق:</label> <input type="number" id="workEnd" value="20">
+            <label>أمر الإغلاق (AI):</label>
+            <textarea id="aiCommand" rows="3"></textarea>
+            <label>ملاحظة ذكية (رد على العلامات):</label>
+            <textarea id="customNote" rows="2"></textarea>
+            <button onclick="saveConfig()">حفظ الإعدادات</button>
         </div>
     </div>
 
-    <button class="refresh-btn" onclick="loadData()">تحديث البيانات 🔄</button>
-
-    <table>
-        <thead>
-            <tr>
-                <th>رقم الهاتف</th>
-                <th>تفاصيل التسجيل</th>
-                <th>الوقت</th>
-            </tr>
-        </thead>
-        <tbody id="studentTable">
-            </tbody>
-    </table>
+    <div class="main">
+        <div class="card">
+            <h3>👥 إدارة الطلاب المسجلين</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>السكن</th>
+                        <th>المواليد</th>
+                        <th>الدراسة</th>
+                        <th>الوقت المفضل</th>
+                        <th>الهاتف</th>
+                    </tr>
+                </thead>
+                <tbody id="studentBody"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
-    async function loadData() {
-        try {
-            const response = await fetch('/api/data');
-            const data = await response.json();
-            
-            // تحديث الإحصائيات
-            document.getElementById('regCount').innerText = data.count;
-            const statusDiv = document.getElementById('botStatus');
-            statusDiv.innerText = data.status === "work" ? "قيد العمل (رد طبيعي) ✅" : "وضع النوم (رد المدير نائم) 😴";
-            statusDiv.className = data.status === "work" ? "status-open" : "status-sleep";
-
-            // تحديث الجدول
-            const tableBody = document.getElementById('studentTable');
-            tableBody.innerHTML = '';
-            
-            data.registrations.reverse().forEach(reg => {
-                const row = `<tr>
-                    <td>${reg.phone.replace('@c.us', '')}</td>
-                    <td>${reg.details}</td>
-                    <td>${reg.time}</td>
-                </tr>`;
-                tableBody.innerHTML += row;
-            });
-        } catch (err) {
-            console.error("خطأ في جلب البيانات:", err);
-        }
+    async function loadAdmin() {
+        const res = await fetch('/api/admin');
+        const data = await res.json();
+        
+        // تعبئة الإعدادات
+        document.getElementById('aiCommand').value = data.botConfig.aiCommand;
+        document.getElementById('customNote').value = data.botConfig.customNote;
+        
+        // تعبئة الجدول
+        const tbody = document.getElementById('studentBody');
+        tbody.innerHTML = data.registrations.map(r => `
+            <tr>
+                <td>${r.name}</td>
+                <td>${r.address}</td>
+                <td>${r.dob}</td>
+                <td>${r.job}</td>
+                <td>${r.timePref}</td>
+                <td>${r.phone.split('@')[0]}</td>
+            </tr>
+        `).join('');
     }
 
-    // تحديث تلقائي كل 30 ثانية
-    setInterval(loadData, 30000);
-    loadData();
-</script>
+    async function saveConfig() {
+        const config = {
+            workStart: parseInt(document.getElementById('workStart').value),
+            workEnd: parseInt(document.getElementById('workEnd').value),
+            aiCommand: document.getElementById('aiCommand').value,
+            customNote: document.getElementById('customNote').value
+        };
+        await fetch('/api/config', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(config)
+        });
+        alert('تم الحفظ بنجاح!');
+    }
 
+    setInterval(loadAdmin, 5000);
+    loadAdmin();
+</script>
 </body>
 </html>
