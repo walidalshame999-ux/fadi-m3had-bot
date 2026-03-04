@@ -2,305 +2,100 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة معهد الفتح | الإدارة العامة</title>
+    <title>إدارة معهد الفتح | نظام الإكسل والذكاء</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #1877f2;
-            --success-color: #42b72a;
-            --warning-color: #f1c40f;
-            --danger-color: #e74c3c;
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-        }
-
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background: var(--bg-color); 
-            margin: 0; 
-            padding: 0; 
-            color: #1c1e21; 
-            direction: rtl;
-        }
-
-        .navbar { 
-            background: var(--primary-color); 
-            color: white; 
-            padding: 1rem 2rem; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .wrapper { 
-            max-width: 1300px; 
-            margin: 2rem auto; 
-            display: grid; 
-            grid-template-columns: 380px 1fr; 
-            gap: 2rem; 
-            padding: 0 1rem; 
-        }
-
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            padding: 1.5rem; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
-            margin-bottom: 2rem;
-        }
-
-        h2, h3 { 
-            margin-top: 0; 
-            color: var(--primary-color); 
-            border-bottom: 2px solid #f0f2f5; 
-            padding-bottom: 0.8rem; 
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        label { 
-            display: block; 
-            margin-top: 1.2rem; 
-            font-weight: bold; 
-            font-size: 0.95rem; 
-            color: #4b4f56;
-        }
-
-        textarea, input, select { 
-            width: 100%; 
-            padding: 12px; 
-            margin-top: 8px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: border 0.3s;
-        }
-
-        textarea:focus, input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        .btn { 
-            background: var(--success-color); 
-            color: white; 
-            border: none; 
-            padding: 14px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            width: 100%; 
-            margin-top: 1.5rem; 
-            font-size: 1.1rem;
-            transition: transform 0.2s, background 0.3s;
-        }
-
-        .btn:hover { 
-            background: #36a420; 
-            transform: translateY(-2px);
-        }
-
-        .status-box {
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #ffeeba;
-            margin-bottom: 20px;
-        }
-
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 1rem; 
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        th { 
-            background: #f8f9fa; 
-            color: #606770; 
-            text-align: right; 
-            padding: 15px; 
-            border-bottom: 2px solid #ddd; 
-            font-size: 0.9rem;
-        }
-
-        td { 
-            padding: 15px; 
-            border-bottom: 1px solid #eee; 
-            vertical-align: middle;
-        }
-
-        .badge { 
-            padding: 5px 10px; 
-            border-radius: 6px; 
-            font-size: 12px; 
-            color: white; 
-            font-weight: bold;
-        }
-
-        .badge-blue { background: var(--primary-color); }
-        .badge-green { background: var(--success-color); }
-        .badge-orange { background: var(--warning-color); color: #333; }
-
-        #live-clock {
-            font-family: monospace;
-            font-size: 1.2rem;
-            background: rgba(0,0,0,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
-
-        @media (max-width: 900px) {
-            .wrapper { grid-template-columns: 1fr; }
-        }
+        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; direction: rtl; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .btn-excel { background: #1d6f42; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: inherit; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: right; }
+        th { background: #1877f2; color: white; }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div style="font-size: 1.4rem; font-weight: bold; display: flex; align-items: center; gap: 10px;">
-        <span>🏢 نظام معهد الفتح الذكي</span>
-    </div>
-    <div id="live-clock">00:00:00</div>
+<div class="card">
+    <h2>🛠 بنك المعلومات (سطر لكل أمر)</h2>
+    <textarea id="aiKnowledge" rows="6"></textarea>
+    <button onclick="saveConfig()" style="margin-top:10px; background:#1877f2; color:white; border:none; padding:10px 20px; border-radius:5px;">حفظ الإعدادات</button>
 </div>
 
-<div class="wrapper">
-    <div class="sidebar">
-        <div class="card">
-            <h3>🎮 تحكم ذكاء البوت</h3>
-            
-            <div class="status-box">
-                <label>😴 وضع النوم (يدوي):</label>
-                <select id="isSleepMode">
-                    <option value="false">إيقاف - الوضع الطبيعي</option>
-                    <option value="true">تفعيل - المدير نائم</option>
-                </select>
-                <small style="display:block; margin-top:5px; color:#856404;">* عند التفعيل، سيرد البوت برسالة النوم لكنه سيستمر في تسجيل الطلاب.</small>
-            </div>
-
-            <label>📢 وصف حالة المعهد (رد عام):</label>
-            <textarea id="statusNote" rows="3" placeholder="مثلاً: المعهد مفتوح ونستقبلكم من 8 صباحاً لـ 8 مساءً."></textarea>
-            
-            <label>💤 رسالة وضع النوم:</label>
-            <textarea id="sleepResponse" rows="3"></textarea>
-            
-            <label>🧠 بنك معلومات الذكاء (AI):</label>
-            <textarea id="aiKnowledge" rows="5" placeholder="اكتب هنا معلومات العلامات، المواعيد، وأي استفسارات ليرد عليها البوت تلقائياً..."></textarea>
-            
-            <div style="margin-top: 20px; padding: 10px; background: #e7f3ff; border-radius: 8px;">
-                <input type="checkbox" id="regToggle" style="width: auto;"> 
-                <label style="display: inline; margin-right: 10px;">فتح باب التسجيل للطلاب</label>
-            </div>
-
-            <button class="btn" onclick="updateSystem()">حفظ وتحديث النظام 🚀</button>
-        </div>
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3>📊 الطلاب المسجلين</h3>
+        <button class="btn-excel" onclick="exportToExcel()">تصدير Excel احترافي 📥</button>
     </div>
-
-    <div class="main">
-        <div class="card">
-            <h3>📊 الطلاب المسجلين حديثاً</h3>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الاسم الثلاثي</th>
-                            <th>المواليد</th>
-                            <th>السكن</th>
-                            <th>العمل والدراسة</th>
-                            <th>الدوام</th>
-                            <th>رقم الواتساب</th>
-                        </tr>
-                    </thead>
-                    <tbody id="regTable">
-                        </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>الاسم الثلاثي</th>
+                <th>العمر</th>
+                <th>السكن</th>
+                <th>العمل</th>
+                <th>الدراسة</th>
+                <th>رقم الواتساب</th>
+            </tr>
+        </thead>
+        <tbody id="regTable"></tbody>
+    </table>
 </div>
 
 <script>
-    // جلب البيانات من السيرفر
+    let currentRegs = [];
+
     async function fetchData() {
-        try {
-            const res = await fetch('/api/system');
-            const data = await res.json();
-            
-            // تعبئة حقول الإعدادات
-            document.getElementById('statusNote').value = data.botConfig.statusNote || "";
-            document.getElementById('sleepResponse').value = data.botConfig.sleepResponse || "";
-            document.getElementById('aiKnowledge').value = data.botConfig.aiKnowledge || "";
-            document.getElementById('regToggle').checked = data.botConfig.regToggle;
-            document.getElementById('isSleepMode').value = String(data.botConfig.isSleepMode);
+        const res = await fetch('/api/system');
+        const data = await res.json();
+        currentRegs = data.registrations;
+        document.getElementById('aiKnowledge').value = data.botConfig.aiKnowledge;
 
-            // تعبئة جدول الطلاب
-            const tbody = document.getElementById('regTable');
-            if (data.registrations && data.registrations.length > 0) {
-                tbody.innerHTML = data.registrations.slice().reverse().map(r => `
-                    <tr>
-                        <td><b>${r.name}</b></td>
-                        <td>${r.dob || 'غير محدد'}</td>
-                        <td>${r.address || 'غير محدد'}</td>
-                        <td>${r.job || 'غير محدد'}</td>
-                        <td><span class="badge ${r.timePref === 'صباحي' ? 'badge-blue' : 'badge-green'}">${r.timePref || 'غير محدد'}</span></td>
-                        <td><a href="https://wa.me/${r.phone.split('@')[0]}" target="_blank" style="text-decoration:none; color:#1877f2;">${r.phone.split('@')[0]}</a></td>
-                    </tr>
-                `).join('');
-            } else {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#999;">لا يوجد طلاب مسجلون حالياً</td></tr>';
-            }
-        } catch (err) {
-            console.error("خطأ في جلب البيانات:", err);
-        }
+        document.getElementById('regTable').innerHTML = data.registrations.map(r => `
+            <tr>
+                <td>${r.name}</td>
+                <td>${r.age}</td>
+                <td>${r.address || '-'}</td>
+                <td>${r.job}</td>
+                <td>${r.study}</td>
+                <td>${r.phone}</td>
+            </tr>
+        `).join('');
     }
 
-    // إرسال التحديثات للسيرفر
-    async function updateSystem() {
-        const payload = {
-            statusNote: document.getElementById('statusNote').value,
-            sleepResponse: document.getElementById('sleepResponse').value,
-            aiKnowledge: document.getElementById('aiKnowledge').value,
-            regToggle: document.getElementById('regToggle').checked,
-            isSleepMode: document.getElementById('isSleepMode').value === 'true'
-        };
+    function exportToExcel() {
+        if(currentRegs.length === 0) return alert("لا يوجد بيانات لتصديرها");
+        
+        const dataForExcel = currentRegs.map(r => ({
+            "الاسم الثلاثي": r.name,
+            "العمر": r.age,
+            "سنة التولد": r.birthYear,
+            "السكن": r.address,
+            "العمل الحالي": r.job,
+            "الدراسة": r.study,
+            "رقم التواصل": r.phone,
+            "تاريخ التسجيل": r.regDate
+        }));
 
-        try {
-            const res = await fetch('/api/update-config', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            });
-            
-            if(res.ok) {
-                alert('✅ تم تحديث ذكاء النظام وحفظ الإعدادات بنجاح!');
-                fetchData();
-            }
-        } catch (err) {
-            alert('❌ فشل الاتصال بالسيرفر');
-        }
+        const ws = XLSX.utils.json_to_sheet(dataForExcel);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "طلاب معهد الفتح");
+        XLSX.writeFile(wb, "قائمة_طلاب_المعهد.xlsx");
     }
 
-    // تحديث الساعة والبيانات دورياً
-    setInterval(() => {
-        const now = new Date();
-        document.getElementById('live-clock').innerText = now.toLocaleTimeString('ar-EG');
-    }, 1000);
+    async function saveConfig() {
+        const payload = { aiKnowledge: document.getElementById('aiKnowledge').value };
+        await fetch('/api/update-config', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        alert('تم الحفظ!');
+    }
 
-    // تحديث البيانات كل 10 ثوانٍ
+    fetchData();
     setInterval(fetchData, 10000);
-    
-    // تشغيل الجلب لأول مرة عند تحميل الصفحة
-    window.onload = fetchData;
 </script>
 </body>
 </html>
