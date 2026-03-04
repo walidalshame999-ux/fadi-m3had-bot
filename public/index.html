@@ -1,1 +1,68 @@
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم بوت معهد الفتح</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7f6; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        h2 { color: #2c3e50; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
+        button:hover { background: #219150; }
+        .status { text-align: center; margin-top: 10px; color: #e67e22; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>التحكم في بوت معهد الفتح</h2>
+    
+    <div class="form-group">
+        <label>حالة المعهد الآن:</label>
+        <select id="botStatus">
+            <option value="open">مفتوح (رد طبيعي)</option>
+            <option value="closed">مغلق (رد "المدير نائم")</option>
+            <option value="auto">تلقائي (حسب الوقت)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>وقت بدء العمل (صباحاً):</label>
+        <input type="time" id="startTime" value="08:00">
+    </div>
+
+    <div class="form-group">
+        <label>وقت انتهاء العمل (مساءً):</label>
+        <input type="time" id="endTime" value="20:00">
+    </div>
+
+    <div class="form-group">
+        <label>رسالة "المدير نائم":</label>
+        <textarea id="sleepMsg" rows="3">المدير نائم حالياً أو المعهد مغلق، سنرد عليك في أقرب وقت. ساعات الدوام من 8ص إلى 8م.</textarea>
+    </div>
+
+    <button onclick="saveSettings()">حفظ الإعدادات</button>
+    <div id="statusText" class="status"></div>
+</div>
+
+<script>
+    function saveSettings() {
+        const settings = {
+            status: document.getElementById('botStatus').value,
+            start: document.getElementById('startTime').value,
+            end: document.getElementById('endTime').value,
+            msg: document.getElementById('sleepMsg').value
+        };
+        
+        // هنا سنقوم بإرسال هذه البيانات للسيرفر (Render) لاحقاً
+        console.log("تم حفظ الإعدادات:", settings);
+        document.getElementById('statusText').innerText = "تم تحديث الإعدادات بنجاح!";
+    }
+</script>
+
+</body>
+</html>
