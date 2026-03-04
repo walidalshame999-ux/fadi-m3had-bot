@@ -3,60 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة معهد الفتح | الإدارة العليا</title>
+    <title>إدارة معهد الفتح | الإدارة الذكية</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #1877f2; --success: #28a745; --danger: #dc3545; --bg: #f4f6f9; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
-        .dashboard { display: grid; grid-template-columns: 350px 1fr; gap: 20px; max-width: 1400px; margin: auto; }
+        .header { text-align: center; margin-bottom: 20px; color: var(--primary); }
+        .dashboard { display: grid; grid-template-columns: 380px 1fr; gap: 20px; max-width: 1400px; margin: auto; }
         .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h2, h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 14px; }
-        textarea, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; box-sizing: border-box; }
-        textarea:focus { border-color: var(--primary); outline: none; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 16px; transition: 0.3s; }
-        .btn-save:hover { background: #155db1; }
-        .btn-excel { background: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        textarea, input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; box-sizing: border-box; transition: 0.3s; }
+        textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 5px rgba(24,119,242,0.2); }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 16px; transition: 0.3s; }
+        .btn-save:hover { background: #155db1; transform: translateY(-2px); }
+        .btn-excel { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; }
         .btn-excel:hover { background: #218838; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: right; }
-        th { background: #f8f9fa; color: #555; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; background: white; }
+        th, td { border: 1px solid #eee; padding: 14px; text-align: right; }
+        th { background: #f8f9fa; color: #555; font-weight: 700; }
         tr:hover { background: #f1f7fe; }
-        .highlight-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .ai-box { background: linear-gradient(145deg, #fff3cd, #ffebad); border: 1px solid #ffeeba; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
         
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
+<div class="header">
+    <h1>معهد الفتح الخيري 🤖 (نظام الإدارة المدعوم بالذكاء الاصطناعي)</h1>
+</div>
+
 <div class="dashboard">
     <div class="card sidebar">
-        <h3>⚙️ مركز أوامر الذكاء الاصطناعي</h3>
+        <h3>🧠 مركز توجيه الذكاء الاصطناعي</h3>
         
-        <div class="highlight-box">
-            <label style="color:#856404; margin-top:0;">📢 إعلان طوارئ / تنويه هام:</label>
-            <textarea id="announcement" rows="2" placeholder="مثال: نعتذر، لا يوجد تسجيل اليوم.."></textarea>
-            <small style="color:#666; font-size:11px;">(إذا كتبت شيئاً هنا، سيرسله البوت كرسالة عاجلة لكل من يراسله)</small>
+        <div class="ai-box">
+            <label style="color:#856404; margin-top:0;">🚨 لوحة الطوارئ (تتفاعل تلقائياً):</label>
+            <textarea id="announcement" rows="2" placeholder="اكتب هنا أي تحديث طارئ (مثال: لا يوجد تسجيل اليوم) وسيفهمه البوت تلقائياً.."></textarea>
+            <small style="color:#666; font-size:12px;">* البوت سيحلل هذا النص؛ إذا كتبت "لا يوجد تسجيل" سيقوم بإيقاف التسجيل تلقائياً والاعتذار للطلاب.</small>
         </div>
 
-        <label>🤖 الرسالة الترحيبية الدائمة:</label>
+        <label>👋 الرسالة الترحيبية الدائمة:</label>
         <textarea id="welcomeMessage" rows="2"></textarea>
 
-        <label>📚 بنك المعلومات (سطر لكل معلومة):</label>
-        <textarea id="aiKnowledge" rows="6" placeholder="مثال:&#10;المدير: فادي علي&#10;الدورات: برمجة وتصميم"></textarea>
+        <label>📚 بنك المعلومات (تغذية الذكاء الاصطناعي):</label>
+        <textarea id="aiKnowledge" rows="6" placeholder="اكتب سطر لكل معلومة. مثال:&#10;الدورات: برمجة وتصميم"></textarea>
         
-        <div style="margin-top: 15px; padding: 10px; border: 1px solid #eee; border-radius: 8px;">
-            <input type="checkbox" id="regToggle" style="width:auto;"> <label style="display:inline;">تفعيل استقبال التسجيلات</label>
+        <div style="margin-top: 20px; padding: 10px; background: #e7f3ff; border-radius: 8px;">
+            <input type="checkbox" id="regToggle" style="width:auto; transform: scale(1.2);"> 
+            <label style="display:inline; margin-right: 8px; font-size: 15px;">السماح بالتسجيل العام</label>
         </div>
 
-        <button class="btn-save" onclick="saveConfig()">حفظ الإعدادات وتحديث البوت 🔄</button>
+        <button class="btn-save" onclick="saveConfig()">حفظ البيانات وتلقين البوت 🚀</button>
     </div>
 
     <div class="card main">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>📊 قائمة الطلاب المسجلين (مزامنة مباشرة)</h3>
-            <button class="btn-excel" onclick="exportToExcel()">تصدير Excel 📥</button>
+            <h3>📊 قاعدة بيانات الطلاب (تزامن لحظي)</h3>
+            <button class="btn-excel" onclick="exportToExcel()">تصدير إلى Excel 📥</button>
         </div>
         
         <div style="overflow-x:auto;">
@@ -64,16 +70,16 @@
                 <thead>
                     <tr>
                         <th>الاسم الثلاثي</th>
-                        <th>العمر</th>
+                        <th>العمر (دقيق)</th>
                         <th>سنة التولد</th>
                         <th>العمل</th>
                         <th>الدراسة</th>
-                        <th>رقم الهاتف</th>
-                        <th>تاريخ التسجيل</th>
+                        <th>رقم الواتساب</th>
+                        <th>وقت التسجيل</th>
                     </tr>
                 </thead>
                 <tbody id="regTable">
-                    <tr><td colspan="7" style="text-align:center;">جاري جلب البيانات...</td></tr>
+                    <tr><td colspan="7" style="text-align:center;">جاري جلب البيانات المتزامنة...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -83,14 +89,13 @@
 <script>
     let currentRegs = [];
 
-    // جلب البيانات مع تحديث الجدول
     async function fetchData() {
         try {
             const res = await fetch('/api/system');
             const data = await res.json();
             currentRegs = data.registrations;
             
-            // تحديث الحقول فقط إذا لم تكن قيد التعديل لتجنب مسح كتابتك
+            // تحديث الحقول فقط إذا كان المدير لا يكتب بداخلها (لمنع مسح الكتابة)
             if (document.activeElement.tagName !== "TEXTAREA" && document.activeElement.tagName !== "INPUT") {
                 document.getElementById('announcement').value = data.botConfig.announcement || "";
                 document.getElementById('welcomeMessage').value = data.botConfig.welcomeMessage;
@@ -98,33 +103,31 @@
                 document.getElementById('regToggle').checked = data.botConfig.regToggle;
             }
 
-            // تحديث الجدول ليكون متزامناً
+            // رسم الجدول بتزامن تام مع البيانات القادمة من الواتساب
             const tbody = document.getElementById('regTable');
             if (currentRegs.length > 0) {
-                // عرض الأحدث أولاً
                 tbody.innerHTML = currentRegs.slice().reverse().map(r => `
                     <tr>
                         <td><b>${r.name}</b></td>
-                        <td>${r.age}</td>
+                        <td style="color:var(--primary); font-weight:bold;">${r.age} سنة</td>
                         <td>${r.birthYear}</td>
                         <td>${r.job}</td>
                         <td>${r.study}</td>
-                        <td dir="ltr" style="text-align:right;">${r.phone.split('@')[0]}</td>
-                        <td style="font-size:12px; color:#666;">${r.regDate}</td>
+                        <td dir="ltr" style="text-align:right;"><a href="https://wa.me/${r.phone.split('@')[0]}" target="_blank" style="text-decoration:none; color:inherit;">${r.phone.split('@')[0]}</a></td>
+                        <td style="font-size:12px; color:#777;">${r.regDate}</td>
                     </tr>
                 `).join('');
             } else {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#999;">لا يوجد تسجيلات حتى الآن</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#999;">المنظومة جاهزة بانتظار أول طالب...</td></tr>';
             }
-        } catch (err) { console.error("Error fetching data"); }
+        } catch (err) { console.error("Sync Error:", err); }
     }
 
-    // تصدير ملف إكسل منسق
     function exportToExcel() {
         if(currentRegs.length === 0) return alert("لا يوجد بيانات لتصديرها");
         const dataForExcel = currentRegs.map(r => ({
             "الاسم الثلاثي": r.name,
-            "العمر": r.age,
+            "العمر المحسوب": r.age,
             "سنة التولد": r.birthYear,
             "العمل الحالي": r.job,
             "التحصيل الدراسي": r.study,
@@ -133,11 +136,10 @@
         }));
         const ws = XLSX.utils.json_to_sheet(dataForExcel);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "المسجلين");
+        XLSX.utils.book_append_sheet(wb, ws, "طلاب المعهد");
         XLSX.writeFile(wb, "طلاب_معهد_الفتح.xlsx");
     }
 
-    // حفظ أوامر الذكاء
     async function saveConfig() {
         const payload = { 
             announcement: document.getElementById('announcement').value,
@@ -150,12 +152,12 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         });
-        alert('✅ تم تحديث أوامر الذكاء الاصطناعي بنجاح!');
+        alert('🤖 تم تلقين الذكاء الاصطناعي بالأوامر الجديدة بنجاح!');
         fetchData();
     }
 
-    // مزامنة البيانات كل 3 ثوانٍ (للتحديث شبه اللحظي)
-    setInterval(fetchData, 3000);
+    // تزامن سريع جداً كل ثانيتين
+    setInterval(fetchData, 2000);
     fetchData();
 </script>
 </body>
