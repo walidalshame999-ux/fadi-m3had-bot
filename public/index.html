@@ -3,29 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة معهد الفتح | منصة الذكاء الاصطناعي</title>
+    <title>إدارة معهد الفتح | منصة Gemini AI</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2b5797; --success: #1e7145; --danger: #ce1126; --bg: #f5f6fa; }
+        :root { --primary: #6c5ce7; --secondary: #a29bfe; --success: #00b894; --danger: #d63031; --bg: #f5f6fa; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #2d3436; }
         .header { text-align: center; margin-bottom: 25px; color: var(--primary); }
-        .dashboard { display: grid; grid-template-columns: 450px 1fr; gap: 25px; max-width: 1500px; margin: auto; }
+        .dashboard { display: grid; grid-template-columns: 480px 1fr; gap: 25px; max-width: 1600px; margin: auto; }
         .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 12px; font-weight: 700; }
-        label { display: block; margin: 18px 0 8px; font-weight: 600; font-size: 15px; color: #34495e; }
-        textarea, input { width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-family: inherit; box-sizing: border-box; transition: 0.3s; font-size: 14px; }
-        textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(43,87,151,0.1); }
+        label { display: block; margin: 18px 0 8px; font-weight: 600; font-size: 14px; color: #34495e; }
+        textarea, input { width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-family: inherit; box-sizing: border-box; transition: 0.3s; font-size: 13px; }
+        textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(108,92,231,0.1); }
         .btn-save { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; transition: 0.3s; }
-        .btn-save:hover { background: #1a365d; transform: translateY(-2px); }
+        .btn-save:hover { background: #5f27cd; transform: translateY(-2px); }
         .btn-excel { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
-        .btn-excel:hover { background: #144d2f; }
+        .btn-excel:hover { background: #00897b; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; background: white; border-radius: 8px; overflow: hidden; }
         th, td { border: 1px solid #ecf0f1; padding: 15px; text-align: right; }
         th { background: #f8f9fa; color: #2c3e50; font-weight: 700; }
         tr:hover { background: #fdfdfe; }
-        .ai-box { background: linear-gradient(135deg, #e0f7fa 0%, #e1bee7 100%); border: none; padding: 18px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .toggle-container { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }
+        .ai-box { background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border: none; padding: 18px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .toggle-container { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; margin-top: 15px; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
@@ -39,48 +39,52 @@
 <body>
 
 <div class="header">
-    <h1>معهد الفتح الخيري 🎓 (منصة الإدارة والذكاء الاصطناعي)</h1>
+    <h1>معهد الفتح الخيري 🌟 (مدعوم بنظام Gemini AI)</h1>
 </div>
 
 <div class="dashboard">
     <div class="card sidebar">
-        <h3>🧠 مركز تدريب المساعد الذكي</h3>
+        <h3>🧠 مركز قيادة الذكاء الاصطناعي</h3>
 
-        <div class="toggle-container">
+        <div class="toggle-container" style="border-left: 4px solid var(--primary);">
             <div>
-                <strong style="color: var(--primary);">تشغيل المساعد الذكي (AI Persona)</strong>
-                <div style="font-size: 12px; color: #7f8c8d;">تفعيل شخصية السكرتير اللبق للإجابة على الأسئلة</div>
+                <strong style="color: var(--primary);">1. تشغيل Gemini AI (الذكاء التوليدي)</strong>
+                <div style="font-size: 11px; color: #7f8c8d;">يجيب وكأنه إنسان حقيقي بناءً على المعلومات</div>
             </div>
-            <label class="switch">
-                <input type="checkbox" id="aiEnabled">
-                <span class="slider"></span>
-            </label>
+            <label class="switch"><input type="checkbox" id="geminiEnabled"><span class="slider"></span></label>
+        </div>
+
+        <div class="toggle-container" style="border-left: 4px solid #0984e3; margin-top:10px;">
+            <div>
+                <strong style="color: #0984e3;">2. تشغيل Mini AI (الذكاء المصغر - احتياطي)</strong>
+                <div style="font-size: 11px; color: #7f8c8d;">نظام الأنماط القديم الذي دربناه للرد الحرفي</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="miniAiEnabled"><span class="slider"></span></label>
         </div>
         
         <div class="ai-box">
-            <label style="color:#2c3e50; margin-top:0;">🤖 تدريب الأنماط (الكلمة = الرد):</label>
-            <textarea id="aiTraining" rows="4" placeholder="اكتب الكلمة ومقابلها الرد.."></textarea>
-            <small style="color:#5f27cd; font-size:12px; font-weight:600;">* علم البوت الرد المخصص. مثال: احبك = شكراً أنا مجرد بوت.</small>
+            <label style="color:#2c3e50; margin-top:0;">🤖 توجيهات شخصية Gemini (System Prompt):</label>
+            <textarea id="geminiPrompt" rows="3" placeholder="مثال: أنت سكرتير لبق جداً..."></textarea>
+            
+            <label style="color:#2c3e50; margin-top:10px;">📋 تدريب الأنماط الصارمة (لـ Gemini و Mini):</label>
+            <textarea id="aiTraining" rows="3" placeholder="كلمة = رد مخصص"></textarea>
         </div>
 
         <label>🚨 لوحة الطوارئ والإعلانات:</label>
-        <textarea id="announcement" rows="2" placeholder="اكتب تحديثاً (مثال: التسجيل مغلق اليوم) وسيطبقه البوت فوراً.."></textarea>
+        <textarea id="announcement" rows="2" placeholder="اكتب تحديثاً (مثال: التسجيل مغلق اليوم)"></textarea>
 
-        <label>📚 بنك معلومات المعهد (للرد على الأسئلة):</label>
-        <textarea id="aiKnowledge" rows="5" placeholder="سطر لكل معلومة.."></textarea>
+        <label>📚 بنك معلومات المعهد (لإجابات AI):</label>
+        <textarea id="aiKnowledge" rows="4"></textarea>
 
         <label>👋 رسالة الترحيب الافتراضية:</label>
         <textarea id="welcomeMessage" rows="2"></textarea>
         
         <div class="toggle-container" style="background: #f8fff9; border-color: #c3e6cb;">
             <strong style="color: var(--success);">فتح باب التسجيل للطلاب</strong>
-            <label class="switch">
-                <input type="checkbox" id="regToggle">
-                <span class="slider" style="background-color: #ccc;"></span>
-            </label>
+            <label class="switch"><input type="checkbox" id="regToggle"><span class="slider" style="background-color: #ccc;"></span></label>
         </div>
 
-        <button class="btn-save" onclick="saveConfig()">حفظ البيانات وتلقين البوت 🚀</button>
+        <button class="btn-save" onclick="saveConfig()">تحديث برمجة المعهد 🚀</button>
     </div>
 
     <div class="card main">
@@ -120,7 +124,9 @@
             currentRegs = data.registrations;
             
             if (document.activeElement.tagName !== "TEXTAREA" && document.activeElement.tagName !== "INPUT") {
-                document.getElementById('aiEnabled').checked = data.botConfig.aiEnabled;
+                document.getElementById('geminiEnabled').checked = data.botConfig.geminiEnabled;
+                document.getElementById('miniAiEnabled').checked = data.botConfig.miniAiEnabled;
+                document.getElementById('geminiPrompt').value = data.botConfig.geminiPrompt || "";
                 document.getElementById('aiTraining').value = data.botConfig.aiTraining || "";
                 document.getElementById('announcement').value = data.botConfig.announcement || "";
                 document.getElementById('aiKnowledge').value = data.botConfig.aiKnowledge || "";
@@ -166,7 +172,9 @@
 
     async function saveConfig() {
         const payload = { 
-            aiEnabled: document.getElementById('aiEnabled').checked,
+            geminiEnabled: document.getElementById('geminiEnabled').checked,
+            miniAiEnabled: document.getElementById('miniAiEnabled').checked,
+            geminiPrompt: document.getElementById('geminiPrompt').value,
             aiTraining: document.getElementById('aiTraining').value,
             announcement: document.getElementById('announcement').value,
             aiKnowledge: document.getElementById('aiKnowledge').value,
@@ -178,7 +186,7 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         });
-        alert('🤖 تم تلقين وتحديث المساعد الذكي بنجاح!');
+        alert('🌟 تم تحديث نظام Gemini والذكاء الاصطناعي بنجاح!');
         fetchData();
     }
 
